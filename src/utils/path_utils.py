@@ -78,3 +78,8 @@ def get_config_file() -> Path:
     """Get the configuration file path"""
     config_dir = ensure_dir_exists(get_appdata_path())
     return config_dir / 'config.json'
+
+
+def get_logs_dir() -> Path:
+    """Get the logs directory"""
+    return ensure_dir_exists(get_appdata_path('logs'))

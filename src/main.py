@@ -10,10 +10,33 @@ from pathlib import Path
 # Add src directory to path
 sys.path.insert(0, str(Path(__file__).parent))
 
+# Initialize logger first
+from utils.logger import get_logger
+from utils.path_utils import get_logs_dir
+
+# Create logger with file output
+logs_dir = get_logs_dir()
+log_file = logs_dir / "pyai_ide.log"
+logger = get_logger("PyAI-IDE", log_file)
+
+logger.info("=" * 80)
+logger.info("PyAI IDE - Application Starting")
+logger.info("=" * 80)
+logger.info(f"Python version: {sys.version}")
+logger.info(f"Log file: {log_file}")
+
 try:
+    logger.debug("Importing PyQt5...")
     from PyQt5.QtWidgets import QApplication, QMessageBox
+    logger.debug("PyQt5 imported successfully")
+    
+    logger.debug("Importing MainWindow...")
     from ui.main_window import MainWindow
+    logger.debug("MainWindow imported successfully")
+    
 except ImportError as e:
+    logger.critical(f"Failed to import required modules: {e}")
+    logger.exception("Import error", e)
     print(f"Error: Failed to import required modules: {e}")
     print("\nPlease ensure all dependencies are installed:")
     print("  pip install -r requirements.txt")
@@ -23,20 +46,33 @@ except ImportError as e:
 def main():
     """Main application entry point"""
     try:
+        logger.info("Creating QApplication...")
         app = QApplication(sys.argv)
         
         # Set application metadata
         app.setApplicationName("PyAI IDE")
         app.setApplicationVersion("1.0.0")
+        logger.debug("Application metadata set")
         
         # Create and show main window
+        logger.info("Creating MainWindow...")
         window = MainWindow()
+        logger.info("MainWindow created successfully")
+        
+        logger.info("Showing MainWindow...")
         window.show()
+        logger.info("MainWindow displayed")
         
         # Run application
-        sys.exit(app.exec_())
+        logger.info("Starting event loop...")
+        exit_code = app.exec_()
+        logger.info(f"Event loop exited with code: {exit_code}")
+        
+        sys.exit(exit_code)
         
     except Exception as e:
+        logger.critical(f"Fatal Error: {e}")
+        logger.exception("Fatal application error", e)
         print(f"Fatal Error: {e}")
         print("\nTraceback:")
         traceback.print_exc()
@@ -51,10 +87,11 @@ def main():
                 None,
                 "PyAI IDE - Fatal Error",
                 f"An error occurred while starting the application:\n\n{str(e)}\n\n"
-                f"Please check the console output for more details."
+                f"Please check the console output and log file for more details.\n"
+                f"Log file: {log_file}"
             )
-        except:
-            pass
+        except Exception as dialog_error:
+            logger.error(f"Failed to show error dialog: {dialog_error}")
         
         sys.exit(1)
 
