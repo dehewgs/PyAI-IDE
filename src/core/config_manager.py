@@ -55,6 +55,7 @@ class ConfigManager:
         """Initialize config manager"""
         try:
             self.config_file = get_config_file()
+            self.config = None  # Initialize to None first
             self.config = self._load_config()
         except Exception as e:
             print(f"Warning: Failed to load config: {e}")
@@ -73,12 +74,14 @@ class ConfigManager:
                 print(f"Error loading config file: {e}")
                 return self.DEFAULT_CONFIG.copy()
         else:
-            # Save default config
+            # Initialize config first, then save
+            default_config = self.DEFAULT_CONFIG.copy()
+            self.config = default_config
             try:
                 self.save()
             except Exception as e:
                 print(f"Warning: Could not save default config: {e}")
-            return self.DEFAULT_CONFIG.copy()
+            return default_config
     
     def _merge_configs(self, defaults: Dict, custom: Dict) -> Dict:
         """
@@ -113,6 +116,8 @@ class ConfigManager:
             Configuration value
         """
         try:
+            if self.config is None:
+                return default
             return get_nested(self.config, key, default)
         except Exception as e:
             print(f"Error getting config key '{key}': {e}")
@@ -127,6 +132,8 @@ class ConfigManager:
             value: Value to set
         """
         try:
+            if self.config is None:
+                self.config = self.DEFAULT_CONFIG.copy()
             set_nested(self.config, key, value)
         except Exception as e:
             print(f"Error setting config key '{key}': {e}")
@@ -142,6 +149,10 @@ class ConfigManager:
             print("Warning: No config file path set")
             return False
         
+        if self.config is None:
+            print("Warning: No config to save")
+            return False
+        
         try:
             return save_json(self.config_file, self.config)
         except Exception as e:
@@ -155,6 +166,8 @@ class ConfigManager:
     
     def get_all(self) -> Dict[str, Any]:
         """Get entire configuration dictionary"""
+        if self.config is None:
+            return self.DEFAULT_CONFIG.copy()
         return self.config.copy()
     
     def update(self, updates: Dict[str, Any]) -> None:
