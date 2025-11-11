@@ -66,37 +66,47 @@ echo.
 
 REM Install/upgrade dependencies
 echo [*] Installing dependencies...
-pip install -q --upgrade pip
+echo.
+
+REM Try to upgrade pip (non-critical, continue if fails)
+pip install --upgrade pip >nul 2>&1
 if errorlevel 1 (
-    echo.
-    echo [ERROR] Failed to upgrade pip
-    echo.
-    pause
-    exit /b 1
+    echo [!] Warning: Could not upgrade pip (this is usually safe to ignore)
+) else (
+    echo [OK] pip upgraded
 )
 
-pip install -q -r requirements.txt
+REM Install requirements
+pip install -r requirements.txt
 if errorlevel 1 (
     echo.
     echo [ERROR] Failed to install dependencies from requirements.txt
     echo.
     echo Trying to install dependencies individually...
+    echo.
+    
     pip install PyQt5==5.15.9
+    if errorlevel 1 echo [!] Warning: PyQt5 installation had issues
+    
     pip install PyGithub==2.1.1
+    if errorlevel 1 echo [!] Warning: PyGithub installation had issues
+    
     pip install GitPython==3.1.40
+    if errorlevel 1 echo [!] Warning: GitPython installation had issues
+    
     pip install huggingface-hub==0.20.0
+    if errorlevel 1 echo [!] Warning: huggingface-hub installation had issues
+    
     pip install transformers==4.35.0
+    if errorlevel 1 echo [!] Warning: transformers installation had issues
+    
     pip install torch==2.1.0
-    if errorlevel 1 (
-        echo.
-        echo [ERROR] Failed to install dependencies
-        echo Please check your internet connection and try again
-        echo.
-        pause
-        exit /b 1
-    )
+    if errorlevel 1 echo [!] Warning: torch installation had issues
+    
+    echo.
+    echo [*] Continuing with application launch...
 )
-echo [OK] Dependencies installed successfully
+echo [OK] Dependencies installed
 echo.
 
 REM Launch the application
@@ -112,6 +122,11 @@ if errorlevel 1 (
     echo ╚════════════════════════════════════════════════════════════════╝
     echo.
     echo The application exited with an error. Please check the output above.
+    echo.
+    echo Common issues:
+    echo - Missing dependencies: Try running pip install -r requirements.txt manually
+    echo - PyQt5 issues: Make sure you have a display/graphics driver
+    echo - GitHub/HuggingFace: Check your internet connection
     echo.
     pause
     exit /b 1
