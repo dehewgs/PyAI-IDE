@@ -3,7 +3,7 @@ HuggingFace service for model management
 """
 
 from typing import Tuple, Dict, List
-from src.utils.logger import logger
+from utils.logger import logger
 
 
 class HuggingFaceService:

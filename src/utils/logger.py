@@ -171,3 +171,6 @@ def get_logger(name: str = "PyAI-IDE", log_file: Optional[Path] = None) -> Logge
         _logger = Logger(name, log_file)
     
     return _logger
+
+# Create default logger instance for module-level import
+logger = get_logger()
