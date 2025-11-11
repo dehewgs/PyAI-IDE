@@ -97,12 +97,8 @@ class MainWindow(QMainWindow):
         self.tab_widget = QTabWidget()
         self.tab_widget.setTabsClosable(True)
         self.tab_widget.tabCloseRequested.connect(self._on_tab_close)
-        self.tab_widget.currentChanged.connect(self._on_tab_changed)
         
         # Create initial editor tab
-        self.editor = CodeEditor()
-        self.tab_widget.addTab(self.editor, "Untitled")
-        self.open_files["Untitled"] = self.editor
         
         center_layout.addWidget(self.tab_widget)
         
@@ -131,6 +127,14 @@ class MainWindow(QMainWindow):
         self.progress_bar.setMaximumWidth(200)
         self.progress_bar.setVisible(False)
         self.status_bar.addPermanentWidget(self.progress_bar)
+        
+        # Connect tab signals AFTER status_bar is created
+        self.tab_widget.currentChanged.connect(self._on_tab_changed)
+        
+        # Create initial editor tab AFTER status_bar is created
+        self.editor = CodeEditor()
+        self.tab_widget.addTab(self.editor, "Untitled")
+        self.open_files["Untitled"] = self.editor
     
     def _create_menu_bar(self):
         """Create menu bar"""
