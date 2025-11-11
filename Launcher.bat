@@ -9,9 +9,9 @@ cd /d "%~dp0"
 
 REM Display header
 echo.
-echo ╔════════════════════════════════════════════════════════════════╗
-echo ║                    PyAI IDE Launcher                           ║
-echo ╚════════════════════════════════════════════════════════════════╝
+echo ========================================================================
+echo                    PyAI IDE Launcher
+echo ========================================================================
 echo.
 
 REM Check if Python is installed
@@ -97,10 +97,10 @@ if errorlevel 1 (
     pip install huggingface-hub==0.20.0
     if errorlevel 1 echo [!] Warning: huggingface-hub installation had issues
     
-    pip install transformers==4.35.0
+    pip install transformers
     if errorlevel 1 echo [!] Warning: transformers installation had issues
     
-    pip install torch==2.1.0
+    pip install torch
     if errorlevel 1 echo [!] Warning: torch installation had issues
     
     echo.
@@ -117,9 +117,9 @@ python launcher.py %*
 REM Check if application exited with error
 if errorlevel 1 (
     echo.
-    echo ╔════════════════════════════════════════════════════════════════╗
-    echo ║                    APPLICATION ERROR                           ║
-    echo ╚════════════════════════════════════════════════════════════════╝
+    echo ========================================================================
+    echo                    APPLICATION ERROR
+    echo ========================================================================
     echo.
     echo The application exited with an error. Please check the output above.
     echo.
