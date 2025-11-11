@@ -3,8 +3,12 @@ Configuration manager for PyAI IDE
 Handles loading, saving, and managing application configuration
 """
 
+import sys
 from pathlib import Path
 from typing import Any, Dict, Optional
+
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from utils.config_utils import load_json, save_json, get_nested, set_nested
 from utils.path_utils import get_config_file
@@ -49,18 +53,31 @@ class ConfigManager:
     
     def __init__(self):
         """Initialize config manager"""
-        self.config_file = get_config_file()
-        self.config = self._load_config()
+        try:
+            self.config_file = get_config_file()
+            self.config = self._load_config()
+        except Exception as e:
+            print(f"Warning: Failed to load config: {e}")
+            print("Using default configuration")
+            self.config = self.DEFAULT_CONFIG.copy()
+            self.config_file = None
     
     def _load_config(self) -> Dict[str, Any]:
         """Load configuration from file or create default"""
-        if self.config_file.exists():
-            config = load_json(self.config_file)
-            # Merge with defaults to ensure all keys exist
-            return self._merge_configs(self.DEFAULT_CONFIG.copy(), config)
+        if self.config_file and self.config_file.exists():
+            try:
+                config = load_json(self.config_file)
+                # Merge with defaults to ensure all keys exist
+                return self._merge_configs(self.DEFAULT_CONFIG.copy(), config)
+            except Exception as e:
+                print(f"Error loading config file: {e}")
+                return self.DEFAULT_CONFIG.copy()
         else:
             # Save default config
-            self.save()
+            try:
+                self.save()
+            except Exception as e:
+                print(f"Warning: Could not save default config: {e}")
             return self.DEFAULT_CONFIG.copy()
     
     def _merge_configs(self, defaults: Dict, custom: Dict) -> Dict:
@@ -95,7 +112,11 @@ class ConfigManager:
         Returns:
             Configuration value
         """
-        return get_nested(self.config, key, default)
+        try:
+            return get_nested(self.config, key, default)
+        except Exception as e:
+            print(f"Error getting config key '{key}': {e}")
+            return default
     
     def set(self, key: str, value: Any) -> None:
         """
@@ -105,7 +126,10 @@ class ConfigManager:
             key: Configuration key (e.g., 'github.token')
             value: Value to set
         """
-        set_nested(self.config, key, value)
+        try:
+            set_nested(self.config, key, value)
+        except Exception as e:
+            print(f"Error setting config key '{key}': {e}")
     
     def save(self) -> bool:
         """
@@ -114,7 +138,15 @@ class ConfigManager:
         Returns:
             True if successful, False otherwise
         """
-        return save_json(self.config_file, self.config)
+        if not self.config_file:
+            print("Warning: No config file path set")
+            return False
+        
+        try:
+            return save_json(self.config_file, self.config)
+        except Exception as e:
+            print(f"Error saving config: {e}")
+            return False
     
     def reset_to_defaults(self) -> None:
         """Reset configuration to defaults"""
