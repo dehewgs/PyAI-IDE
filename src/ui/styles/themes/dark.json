@@ -1,0 +1,55 @@
+{
+  "name": "Dark Theme",
+  "id": "dark",
+  "colors": {
+    "primary": "#0e639c",
+    "primary_hover": "#1177bb",
+    "primary_pressed": "#0d5a96",
+    "background": "#1e1e1e",
+    "background_secondary": "#252526",
+    "background_tertiary": "#2d2d2d",
+    "foreground": "#d4d4d4",
+    "foreground_secondary": "#858585",
+    "border": "#3e3e3e",
+    "selection": "#0e639c",
+    "selection_inactive": "#6a6a6a"
+  },
+  "editor": {
+    "background": "#272822",
+    "foreground": "#f8f8f2",
+    "line_number_background": "#272822",
+    "line_number_foreground": "#757569",
+    "current_line_background": "#3e3d32",
+    "selection_background": "#49483e",
+    "keyword": "#f92672",
+    "string": "#e6db74",
+    "comment": "#75715e",
+    "function": "#66d9ef",
+    "number": "#ae81ff",
+    "operator": "#f8f8f2"
+  },
+  "console": {
+    "background": "#1e1e1e",
+    "foreground": "#d4d4d4",
+    "error": "#f48771",
+    "warning": "#dcdcaa",
+    "success": "#6a9955",
+    "info": "#4ec9b0"
+  },
+  "ui": {
+    "menu_background": "#2d2d2d",
+    "menu_foreground": "#d4d4d4",
+    "menu_selected": "#0e639c",
+    "button_background": "#0e639c",
+    "button_foreground": "#d4d4d4",
+    "input_background": "#252526",
+    "input_foreground": "#d4d4d4",
+    "input_border": "#3e3e3e",
+    "tab_background": "#2d2d2d",
+    "tab_foreground": "#d4d4d4",
+    "tab_selected_background": "#1e1e1e",
+    "tab_selected_border": "#0e639c",
+    "status_bar_background": "#2d2d2d",
+    "status_bar_foreground": "#d4d4d4"
+  }
+}
