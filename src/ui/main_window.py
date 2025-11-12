@@ -35,6 +35,7 @@ from ui.dialogs.repository_dialog import RepositoryDialog
 from ui.dialogs.project_dialog import ProjectDialog
 from ui.dialogs.settings_dialog_enhanced import EnhancedSettingsDialog
 from ui.styles.theme_manager_enhanced import EnhancedThemeManager
+from ui.panels.terminal_panel import TerminalPanel
 
 
 class MainWindow(QMainWindow):
@@ -79,6 +80,10 @@ class MainWindow(QMainWindow):
         # Apply saved theme
         saved_theme = self.app_data_manager.get_config_value('theme', 'dark')
         self._apply_theme(saved_theme)
+        
+                
+        # Load last project or first available project
+        self._load_last_project()
         
         logger.info("Main Window initialized successfully")
     
@@ -127,6 +132,11 @@ class MainWindow(QMainWindow):
         self.console_panel = ConsolePanel(theme_manager=self.theme_manager)
         self.theme_manager.register_component(self.console_panel)
         center_layout.addWidget(self.console_panel, 1)
+        
+        # Terminal panel
+        self.terminal_panel = TerminalPanel(theme_manager=self.theme_manager)
+        self.theme_manager.register_component(self.terminal_panel)
+        center_layout.addWidget(self.terminal_panel, 1)
         
         # RIGHT PANEL: Placeholder for future features
         right_panel = QWidget()
@@ -537,3 +547,54 @@ class MainWindow(QMainWindow):
         """Handle key press events"""
         if not self.shortcut_handler.handle_key_event(event):
             super().keyPressEvent(event)
+
+    def _discover_projects(self):
+        """Discover projects from AppData directory"""
+        try:
+            projects_dir = self.app_data_manager.get_app_data_path() / 'projects'
+            
+            if not projects_dir.exists():
+                logger.info("No projects directory found")
+                return []
+            
+            projects = []
+            for item in projects_dir.iterdir():
+                if item.is_dir():
+                    projects.append({
+                        'name': item.name,
+                        'path': str(item),
+                        'created': item.stat().st_ctime
+                    })
+            
+            logger.info(f"Discovered {len(projects)} projects")
+            return sorted(projects, key=lambda x: x['created'], reverse=True)
+        
+        except Exception as e:
+            logger.error(f"Failed to discover projects: {e}")
+            return []
+    
+    def _load_last_project(self):
+        """Load the last opened project on startup"""
+        try:
+            last_project = self.app_data_manager.get_config_value('last_project')
+            
+            if last_project and Path(last_project).exists():
+                self.project_panel.set_project_root(last_project)
+                self.current_project = last_project
+                logger.info(f"Loaded last project: {last_project}")
+                return True
+            
+            # If no last project, try to load first available project
+            projects = self._discover_projects()
+            if projects:
+                first_project = projects[0]['path']
+                self.project_panel.set_project_root(first_project)
+                self.current_project = first_project
+                self.app_data_manager.add_recent_project(first_project)
+                logger.info(f"Loaded first available project: {first_project}")
+                return True
+        
+        except Exception as e:
+            logger.error(f"Failed to load last project: {e}")
+        
+        return False
