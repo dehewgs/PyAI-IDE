@@ -19,10 +19,15 @@ class ModelPanel(QWidget):
     def _create_ui(self):
         """Create model panel UI"""
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         
         # Header
         header_layout = QHBoxLayout()
-        header_layout.addWidget(QLabel("Loaded Models"))
+        header_layout.setContentsMargins(8, 8, 8, 8)
+        header_layout.setSpacing(8)
+        self.header_label = QLabel("Loaded Models")
+        header_layout.addWidget(self.header_label)
         self.refresh_btn = QPushButton("Refresh")
         self.refresh_btn.clicked.connect(self.refresh)
         header_layout.addStretch()
@@ -35,6 +40,8 @@ class ModelPanel(QWidget):
         
         # Buttons
         button_layout = QHBoxLayout()
+        button_layout.setContentsMargins(8, 8, 8, 8)
+        button_layout.setSpacing(8)
         self.unload_btn = QPushButton("Unload")
         self.unload_btn.clicked.connect(self._on_unload)
         button_layout.addWidget(self.unload_btn)
@@ -59,18 +66,20 @@ class ModelPanel(QWidget):
             bg_color = "#1e1e1e"
             fg_color = "#d4d4d4"
             border_color = "#3e3e3e"
+            header_bg = "#252526"
         else:
             # Light theme
             bg_color = "#ffffff"
             fg_color = "#333333"
             border_color = "#cccccc"
+            header_bg = "#f3f3f3"
         
         # Apply stylesheet to list widget
         self.model_list.setStyleSheet(f"""
             QListWidget {{
                 background-color: {bg_color};
                 color: {fg_color};
-                border: 1px solid {border_color};
+                border: none;
             }}
             QListWidget::item:selected {{
                 background-color: #0e639c;
@@ -81,14 +90,25 @@ class ModelPanel(QWidget):
             }}
         """)
         
+        # Apply stylesheet to header label
+        self.header_label.setStyleSheet(f"""
+            QLabel {{
+                color: {fg_color};
+                background-color: {header_bg};
+                padding: 4px 8px;
+                font-weight: bold;
+            }}
+        """)
+        
         # Apply stylesheet to buttons
         button_style = f"""
             QPushButton {{
                 background-color: #0e639c;
                 color: #ffffff;
                 border: none;
-                padding: 5px;
+                padding: 5px 10px;
                 border-radius: 3px;
+                font-weight: bold;
             }}
             QPushButton:hover {{
                 background-color: #1177bb;
@@ -104,9 +124,6 @@ class ModelPanel(QWidget):
         self.setStyleSheet(f"""
             QWidget {{
                 background-color: {bg_color};
-                color: {fg_color};
-            }}
-            QLabel {{
                 color: {fg_color};
             }}
         """)
