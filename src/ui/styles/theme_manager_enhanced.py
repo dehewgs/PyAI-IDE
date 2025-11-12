@@ -86,19 +86,34 @@ class EnhancedThemeManager(QObject):
         input_bg = ui_colors.get('input_background', colors.get('background', '#ffffff'))
         input_fg = ui_colors.get('input_foreground', colors.get('foreground', '#333333'))
         input_border = ui_colors.get('input_border', colors.get('border', '#cccccc'))
-        tab_bg = ui_colors.get('tab_background', colors.get('background_secondary', '#f0f0f0'))
-        tab_fg = ui_colors.get('tab_foreground', colors.get('foreground', '#333333'))
-        tab_selected_bg = ui_colors.get('tab_selected_background', colors.get('background', '#ffffff'))
+        # Determine if dark theme based on background color
+        is_dark = colors.get('background', '#1e1e1e').lower() in ['#1e1e1e', '#000000', '#0a0a0a']
+        
+        # Set appropriate defaults based on theme
+        light_default_bg = '#f0f0f0'
+        dark_default_bg = '#2d2d2d'
+        light_default_fg = '#333333'
+        dark_default_fg = '#d4d4d4'
+        light_default_border = '#cccccc'
+        dark_default_border = '#3e3e3e'
+        
+        default_bg = dark_default_bg if is_dark else light_default_bg
+        default_fg = dark_default_fg if is_dark else light_default_fg
+        default_border = dark_default_border if is_dark else light_default_border
+        
+        tab_bg = ui_colors.get('tab_background', colors.get('background_secondary', default_bg))
+        tab_fg = ui_colors.get('tab_foreground', colors.get('foreground', default_fg))
+        tab_selected_bg = ui_colors.get('tab_selected_background', colors.get('background', default_bg))
         tab_selected_border = ui_colors.get('tab_selected_border', colors.get('primary', '#0e639c'))
-        status_bg = ui_colors.get('status_bar_background', colors.get('background_secondary', '#f0f0f0'))
-        status_fg = ui_colors.get('status_bar_foreground', colors.get('foreground', '#333333'))
-        label_fg = ui_colors.get('label_foreground', colors.get('foreground', '#333333'))
-        border = colors.get('border', '#cccccc')
+        status_bg = ui_colors.get('status_bar_background', colors.get('background_secondary', default_bg))
+        status_fg = ui_colors.get('status_bar_foreground', colors.get('foreground', default_fg))
+        label_fg = ui_colors.get('label_foreground', colors.get('foreground', default_fg))
+        border = colors.get('border', default_border)
         primary = colors.get('primary', '#0e639c')
         primary_hover = colors.get('primary_hover', '#1177bb')
         primary_pressed = colors.get('primary_pressed', '#0d5a96')
-        scrollbar_bg = ui_colors.get('scrollbar_background', colors.get('background_secondary', '#f0f0f0'))
-        scrollbar_handle = ui_colors.get('scrollbar_handle', colors.get('border', '#cccccc'))
+        scrollbar_bg = ui_colors.get('scrollbar_background', colors.get('background_secondary', default_bg))
+        scrollbar_handle = ui_colors.get('scrollbar_handle', colors.get('border', default_border))
         scrollbar_handle_hover = ui_colors.get('scrollbar_handle_hover', colors.get('foreground_secondary', '#999999'))
         
         stylesheet = f"""
