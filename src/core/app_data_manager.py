@@ -60,6 +60,18 @@ class AppDataManager:
             try:
                 with open(self.config_file, 'r') as f:
                     return json.load(f)
+            except json.JSONDecodeError as e:
+                logger.error(f"Failed to load config: {e}")
+                # Backup corrupted config and create new one
+                try:
+                    backup_file = self.config_file.with_suffix('.json.bak')
+                    self.config_file.rename(backup_file)
+                    logger.info(f"Backed up corrupted config to {backup_file}")
+                except Exception as backup_error:
+                    logger.error(f"Failed to backup corrupted config: {backup_error}")
+                config = self._get_default_config()
+                self.save_config(config)
+                return config
             except Exception as e:
                 logger.error(f"Failed to load config: {e}")
                 return self._get_default_config()
