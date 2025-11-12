@@ -214,6 +214,7 @@ class MainWindow(QMainWindow):
         logger.info("New File menu clicked")
         filename = f"Untitled_{len(self.open_files)}"
         editor = CodeEditor(theme_manager=self.theme_manager)
+        self.theme_manager.register_component(editor)
         self.tab_widget.addTab(editor, filename)
         self.open_files[filename] = editor
         self.console_panel.write(f"New file created: {filename}")
@@ -229,6 +230,7 @@ class MainWindow(QMainWindow):
                 
                 filename = Path(path).name
                 editor = CodeEditor(theme_manager=self.theme_manager)
+                self.theme_manager.register_component(editor)
                 editor.setPlainText(content)
                 self.tab_widget.addTab(editor, filename)
                 self.open_files[filename] = editor
