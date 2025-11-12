@@ -102,6 +102,7 @@ class MainWindow(QMainWindow):
         
         # RIGHT PANEL: Console
         self.console_panel = ConsolePanel(theme_manager=self.theme_manager)
+        self.theme_manager.register_component(self.console_panel)
         
         # Add panels to main splitter
         main_splitter.addWidget(left_panel)
@@ -131,6 +132,7 @@ class MainWindow(QMainWindow):
         
         # Create initial editor tab AFTER status_bar is created
         self.editor = CodeEditor(theme_manager=self.theme_manager)
+        self.theme_manager.register_component(self.editor)
         self.tab_widget.addTab(self.editor, "Untitled")
         self.open_files["Untitled"] = self.editor
     

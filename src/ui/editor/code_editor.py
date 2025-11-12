@@ -12,38 +12,67 @@ import re
 class PythonSyntaxHighlighter(QSyntaxHighlighter):
     """Python syntax highlighter with language-specific colors"""
     
-    def __init__(self, document, language="python"):
+    def __init__(self, document, language="python", is_dark=True):
         super().__init__(document)
         self.language = language
+        self.is_dark = is_dark
         self._setup_formats()
     
     def _setup_formats(self):
-        """Setup text formats based on language"""
+        """Setup text formats based on language and theme"""
         # Language-specific color schemes
         if self.language == "python":
-            keyword_color = "#f92672"
-            string_color = "#e6db74"
-            comment_color = "#75715e"
-            function_color = "#66d9ef"
-            number_color = "#ae81ff"
+            if self.is_dark:
+                keyword_color = "#f92672"
+                string_color = "#e6db74"
+                comment_color = "#75715e"
+                function_color = "#66d9ef"
+                number_color = "#ae81ff"
+            else:
+                keyword_color = "#d73a49"
+                string_color = "#032f62"
+                comment_color = "#6a737d"
+                function_color = "#6f42c1"
+                number_color = "#005cc5"
         elif self.language == "javascript":
-            keyword_color = "#d73a49"
-            string_color = "#032f62"
-            comment_color = "#6a737d"
-            function_color = "#6f42c1"
-            number_color = "#005cc5"
+            if self.is_dark:
+                keyword_color = "#f92672"
+                string_color = "#e6db74"
+                comment_color = "#75715e"
+                function_color = "#66d9ef"
+                number_color = "#ae81ff"
+            else:
+                keyword_color = "#d73a49"
+                string_color = "#032f62"
+                comment_color = "#6a737d"
+                function_color = "#6f42c1"
+                number_color = "#005cc5"
         elif self.language == "java":
-            keyword_color = "#d73a49"
-            string_color = "#032f62"
-            comment_color = "#6a737d"
-            function_color = "#6f42c1"
-            number_color = "#005cc5"
+            if self.is_dark:
+                keyword_color = "#f92672"
+                string_color = "#e6db74"
+                comment_color = "#75715e"
+                function_color = "#66d9ef"
+                number_color = "#ae81ff"
+            else:
+                keyword_color = "#d73a49"
+                string_color = "#032f62"
+                comment_color = "#6a737d"
+                function_color = "#6f42c1"
+                number_color = "#005cc5"
         else:  # Default
-            keyword_color = "#f92672"
-            string_color = "#e6db74"
-            comment_color = "#75715e"
-            function_color = "#66d9ef"
-            number_color = "#ae81ff"
+            if self.is_dark:
+                keyword_color = "#f92672"
+                string_color = "#e6db74"
+                comment_color = "#75715e"
+                function_color = "#66d9ef"
+                number_color = "#ae81ff"
+            else:
+                keyword_color = "#d73a49"
+                string_color = "#032f62"
+                comment_color = "#6a737d"
+                function_color = "#6f42c1"
+                number_color = "#005cc5"
         
         # Define formats
         self.keyword_format = QTextCharFormat()
@@ -79,6 +108,16 @@ class PythonSyntaxHighlighter(QSyntaxHighlighter):
             language: Programming language (python, javascript, java, etc.)
         """
         self.language = language
+        self._setup_formats()
+        self.rehighlight()
+    
+    def set_theme(self, is_dark):
+        """Set theme (dark or light)
+        
+        Args:
+            is_dark: True for dark theme, False for light theme
+        """
+        self.is_dark = is_dark
         self._setup_formats()
         self.rehighlight()
     
@@ -130,9 +169,10 @@ class CodeEditor(QPlainTextEdit):
         super().__init__()
         self.theme_manager = theme_manager
         self.language = language
+        self.is_dark = True
         
         # Setup syntax highlighter
-        self.highlighter = PythonSyntaxHighlighter(self.document(), language)
+        self.highlighter = PythonSyntaxHighlighter(self.document(), language, self.is_dark)
         
         # Setup line numbers
         self.line_number_area = LineNumberArea(self)
@@ -150,9 +190,17 @@ class CodeEditor(QPlainTextEdit):
         if self.theme_manager:
             bg = self.theme_manager.get_color("background", "#1e1e1e")
             fg = self.theme_manager.get_color("foreground", "#d4d4d4")
+            # Determine if dark theme based on background brightness
+            bg_color = QColor(bg)
+            brightness = (bg_color.red() + bg_color.green() + bg_color.blue()) / 3
+            self.is_dark = brightness < 128
         else:
             bg = "#1e1e1e"
             fg = "#d4d4d4"
+            self.is_dark = True
+        
+        # Update highlighter theme
+        self.highlighter.set_theme(self.is_dark)
         
         self.setStyleSheet(f"""
             QPlainTextEdit {{
@@ -202,7 +250,10 @@ class CodeEditor(QPlainTextEdit):
         
         if not self.isReadOnly():
             selection = QTextEdit.ExtraSelection()
-            line_color = QColor("#3e3d32")
+            if self.is_dark:
+                line_color = QColor("#3e3d32")
+            else:
+                line_color = QColor("#f0f0f0")
             selection.format.setBackground(line_color)
             selection.format.setProperty(QTextFormat.FullWidthSelection, True)
             selection.cursor = self.textCursor()
@@ -214,7 +265,13 @@ class CodeEditor(QPlainTextEdit):
     def line_number_area_paint_event(self, event):
         """Paint line numbers"""
         painter = QPainter(self.line_number_area)
-        painter.fillRect(event.rect(), QColor("#272822"))
+        
+        if self.is_dark:
+            painter.fillRect(event.rect(), QColor("#272822"))
+            line_number_color = QColor("#757569")
+        else:
+            painter.fillRect(event.rect(), QColor("#f5f5f5"))
+            line_number_color = QColor("#999999")
         
         block = self.firstVisibleBlock()
         block_number = block.blockNumber()
@@ -224,7 +281,7 @@ class CodeEditor(QPlainTextEdit):
         while block.isValid() and top <= event.rect().bottom():
             if block.isVisible() and bottom >= event.rect().top():
                 number = str(block_number + 1)
-                painter.setPen(QColor("#757569"))
+                painter.setPen(line_number_color)
                 painter.drawText(0, int(top), self.line_number_area.width() - 3, 
                                self.fontMetrics().height(), Qt.AlignRight, number)
             

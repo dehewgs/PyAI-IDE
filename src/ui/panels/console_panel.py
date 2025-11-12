@@ -13,7 +13,9 @@ class ConsolePanel(QWidget):
     def __init__(self, theme_manager=None):
         super().__init__()
         self.theme_manager = theme_manager
+        self.is_dark = True
         self._setup_ui()
+        self._apply_theme()
     
     def _setup_ui(self):
         """Setup UI"""
@@ -22,15 +24,6 @@ class ConsolePanel(QWidget):
         # Console output
         self.console_output = QTextEdit()
         self.console_output.setReadOnly(True)
-        self.console_output.setStyleSheet("""
-            QTextEdit {
-                background-color: #1e1e1e;
-                color: #d4d4d4;
-                border: none;
-                font-family: 'Courier New', monospace;
-                font-size: 10pt;
-            }
-        """)
         
         layout.addWidget(self.console_output)
         
@@ -44,18 +37,50 @@ class ConsolePanel(QWidget):
         layout.addLayout(button_layout)
         self.setLayout(layout)
     
-    def write(self, text, color="#d4d4d4"):
+    def _apply_theme(self):
+        """Apply theme to console"""
+        if self.theme_manager:
+            bg = self.theme_manager.get_color("background", "#1e1e1e")
+            fg = self.theme_manager.get_color("foreground", "#d4d4d4")
+            # Determine if dark theme based on background brightness
+            bg_color = QColor(bg)
+            brightness = (bg_color.red() + bg_color.green() + bg_color.blue()) / 3
+            self.is_dark = brightness < 128
+        else:
+            bg = "#1e1e1e"
+            fg = "#d4d4d4"
+            self.is_dark = True
+        
+        self.console_output.setStyleSheet(f"""
+            QTextEdit {{
+                background-color: {bg};
+                color: {fg};
+                border: none;
+                font-family: 'Courier New', monospace;
+                font-size: 10pt;
+            }}
+        """)
+    
+    def write(self, text, color=None):
         """Write text to console
         
         Args:
             text: Text to write
-            color: Text color (hex)
+            color: Text color (hex) - if None, uses foreground color
         """
         cursor = self.console_output.textCursor()
         cursor.movePosition(QTextCursor.End)
         
         fmt = QTextCharFormat()
-        fmt.setForeground(QColor(color))
+        if color:
+            fmt.setForeground(QColor(color))
+        else:
+            # Use foreground color from theme
+            if self.theme_manager:
+                fg = self.theme_manager.get_color("foreground", "#d4d4d4")
+            else:
+                fg = "#d4d4d4"
+            fmt.setForeground(QColor(fg))
         
         cursor.setCharFormat(fmt)
         cursor.insertText(text)
@@ -69,7 +94,11 @@ class ConsolePanel(QWidget):
         Args:
             text: Error message
         """
-        self.write(text + "\n", "#f48771")
+        if self.is_dark:
+            color = "#f48771"
+        else:
+            color = "#cb2431"
+        self.write(text + "\n", color)
     
     def write_warning(self, text):
         """Write warning message
@@ -77,7 +106,11 @@ class ConsolePanel(QWidget):
         Args:
             text: Warning message
         """
-        self.write(text + "\n", "#dcdcaa")
+        if self.is_dark:
+            color = "#dcdcaa"
+        else:
+            color = "#d18616"
+        self.write(text + "\n", color)
     
     def write_success(self, text):
         """Write success message
@@ -85,7 +118,11 @@ class ConsolePanel(QWidget):
         Args:
             text: Success message
         """
-        self.write(text + "\n", "#4ec9b0")
+        if self.is_dark:
+            color = "#4ec9b0"
+        else:
+            color = "#28a745"
+        self.write(text + "\n", color)
     
     def write_info(self, text):
         """Write info message
@@ -93,8 +130,21 @@ class ConsolePanel(QWidget):
         Args:
             text: Info message
         """
-        self.write(text + "\n", "#9cdcfe")
+        if self.is_dark:
+            color = "#9cdcfe"
+        else:
+            color = "#0066cc"
+        self.write(text + "\n", color)
     
     def clear(self):
         """Clear console output"""
         self.console_output.clear()
+    
+    def set_theme(self, is_dark):
+        """Update theme
+        
+        Args:
+            is_dark: True for dark theme, False for light theme
+        """
+        self.is_dark = is_dark
+        self._apply_theme()
