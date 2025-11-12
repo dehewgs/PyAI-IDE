@@ -81,11 +81,13 @@ class MainWindow(QMainWindow):
         left_layout.setContentsMargins(0, 0, 0, 0)
         
         # Project panel
-        self.project_panel = ProjectPanel()
+        self.project_panel = ProjectPanel(theme_manager=self.theme_manager)
+        self.theme_manager.register_component(self.project_panel)
         left_layout.addWidget(self.project_panel)
         
         # Model panel
-        self.model_panel = ModelPanel()
+        self.model_panel = ModelPanel(theme_manager=self.theme_manager)
+        self.theme_manager.register_component(self.model_panel)
         left_layout.addWidget(self.model_panel)
         
         # CENTER PANEL: Editor with tabs

@@ -4,6 +4,7 @@ Project Panel for PyAI IDE
 
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTreeWidget, QTreeWidgetItem, QPushButton, QLabel
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QColor
 from utils.logger import logger
 
 
@@ -12,8 +13,9 @@ class ProjectPanel(QWidget):
     
     file_selected = pyqtSignal(str)
     
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, theme_manager=None):
         super().__init__(parent)
+        self.theme_manager = theme_manager
         self._create_ui()
     
     def _create_ui(self):
@@ -34,6 +36,75 @@ class ProjectPanel(QWidget):
         self.tree.setHeaderLabel("Files")
         self.tree.itemClicked.connect(self._on_item_clicked)
         layout.addWidget(self.tree)
+    
+    def _apply_theme(self):
+        """Apply theme to panel"""
+        if not self.theme_manager:
+            return
+        
+        is_dark = self.theme_manager.current_theme == "dark"
+        self.set_theme(is_dark)
+    
+    def set_theme(self, is_dark):
+        """Set theme for the panel
+        
+        Args:
+            is_dark: True for dark theme, False for light theme
+        """
+        if is_dark:
+            # Dark theme
+            bg_color = "#1e1e1e"
+            fg_color = "#d4d4d4"
+            border_color = "#3e3e3e"
+        else:
+            # Light theme
+            bg_color = "#ffffff"
+            fg_color = "#333333"
+            border_color = "#cccccc"
+        
+        # Apply stylesheet to tree widget
+        self.tree.setStyleSheet(f"""
+            QTreeWidget {{
+                background-color: {bg_color};
+                color: {fg_color};
+                border: 1px solid {border_color};
+            }}
+            QTreeWidget::item:selected {{
+                background-color: #0e639c;
+                color: #ffffff;
+            }}
+            QTreeWidget::item:hover {{
+                background-color: {border_color};
+            }}
+        """)
+        
+        # Apply stylesheet to buttons
+        self.refresh_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: #0e639c;
+                color: #ffffff;
+                border: none;
+                padding: 5px;
+                border-radius: 3px;
+            }}
+            QPushButton:hover {{
+                background-color: #1177bb;
+            }}
+            QPushButton:pressed {{
+                background-color: #0d5a96;
+            }}
+        """)
+        
+        # Apply stylesheet to panel itself
+        self.setStyleSheet(f"""
+            QWidget {{
+                background-color: {bg_color};
+                color: {fg_color};
+            }}
+            QLabel {{
+                color: {fg_color};
+            }}
+        """)
     
     def add_file(self, filename, parent=None):
         """Add file to tree"""

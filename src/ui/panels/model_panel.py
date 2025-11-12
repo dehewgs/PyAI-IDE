@@ -3,14 +3,16 @@ Model Panel for PyAI IDE
 """
 
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QListWidget, QListWidgetItem, QPushButton, QLabel
+from PyQt5.QtGui import QColor
 from utils.logger import logger
 
 
 class ModelPanel(QWidget):
     """Model panel for model management"""
     
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, theme_manager=None):
         super().__init__(parent)
+        self.theme_manager = theme_manager
         self.loaded_models = []
         self._create_ui()
     
@@ -37,6 +39,77 @@ class ModelPanel(QWidget):
         self.unload_btn.clicked.connect(self._on_unload)
         button_layout.addWidget(self.unload_btn)
         layout.addLayout(button_layout)
+    
+    def _apply_theme(self):
+        """Apply theme to panel"""
+        if not self.theme_manager:
+            return
+        
+        is_dark = self.theme_manager.current_theme == "dark"
+        self.set_theme(is_dark)
+    
+    def set_theme(self, is_dark):
+        """Set theme for the panel
+        
+        Args:
+            is_dark: True for dark theme, False for light theme
+        """
+        if is_dark:
+            # Dark theme
+            bg_color = "#1e1e1e"
+            fg_color = "#d4d4d4"
+            border_color = "#3e3e3e"
+        else:
+            # Light theme
+            bg_color = "#ffffff"
+            fg_color = "#333333"
+            border_color = "#cccccc"
+        
+        # Apply stylesheet to list widget
+        self.model_list.setStyleSheet(f"""
+            QListWidget {{
+                background-color: {bg_color};
+                color: {fg_color};
+                border: 1px solid {border_color};
+            }}
+            QListWidget::item:selected {{
+                background-color: #0e639c;
+                color: #ffffff;
+            }}
+            QListWidget::item:hover {{
+                background-color: {border_color};
+            }}
+        """)
+        
+        # Apply stylesheet to buttons
+        button_style = f"""
+            QPushButton {{
+                background-color: #0e639c;
+                color: #ffffff;
+                border: none;
+                padding: 5px;
+                border-radius: 3px;
+            }}
+            QPushButton:hover {{
+                background-color: #1177bb;
+            }}
+            QPushButton:pressed {{
+                background-color: #0d5a96;
+            }}
+        """
+        self.refresh_btn.setStyleSheet(button_style)
+        self.unload_btn.setStyleSheet(button_style)
+        
+        # Apply stylesheet to panel itself
+        self.setStyleSheet(f"""
+            QWidget {{
+                background-color: {bg_color};
+                color: {fg_color};
+            }}
+            QLabel {{
+                color: {fg_color};
+            }}
+        """)
     
     def add_model(self, model_id):
         """Add model to list"""
