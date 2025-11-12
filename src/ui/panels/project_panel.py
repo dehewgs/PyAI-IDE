@@ -120,6 +120,10 @@ class ProjectPanel(QWidget):
                 color: {fg_color};
             }}
         """)
+        
+        # Force update to ensure changes are applied
+        self.update()
+        self.tree.update()
     
     def add_file(self, filename, parent=None):
         """Add file to tree"""

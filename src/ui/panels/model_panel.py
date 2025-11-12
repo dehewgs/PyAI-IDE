@@ -127,6 +127,10 @@ class ModelPanel(QWidget):
                 color: {fg_color};
             }}
         """)
+        
+        # Force update to ensure changes are applied
+        self.update()
+        self.model_list.update()
     
     def add_model(self, model_id):
         """Add model to list"""

@@ -209,6 +209,9 @@ class CodeEditor(QPlainTextEdit):
                 border: none;
             }}
         """)
+        
+        # Update current line highlighting with new theme
+        self.highlight_current_line()
     
     def set_language(self, language):
         """Set programming language for syntax highlighting
@@ -252,8 +255,11 @@ class CodeEditor(QPlainTextEdit):
             selection = QTextEdit.ExtraSelection()
             if self.is_dark:
                 line_color = QColor("#3e3d32")
+                selection_color = QColor("#264f78")
             else:
                 line_color = QColor("#f0f0f0")
+                selection_color = QColor("#add6ff")
+            
             selection.format.setBackground(line_color)
             selection.format.setProperty(QTextFormat.FullWidthSelection, True)
             selection.cursor = self.textCursor()
