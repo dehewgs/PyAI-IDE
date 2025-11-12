@@ -226,9 +226,9 @@ class MainWindow(QMainWindow):
     
     def _connect_signals(self):
         """Connect signals"""
-        self.event_system.model_loaded.connect(self._on_model_loaded_event)
-        self.event_system.inference_complete.connect(self._on_inference_complete_event)
-        self.event_system.file_saved.connect(self._on_file_saved_event)
+        self.event_system.subscribe("model_loaded", self._on_model_loaded_event)
+        self.event_system.subscribe("inference_complete", self._on_inference_complete_event)
+        self.event_system.subscribe("file_saved", self._on_file_saved_event)
     
     def _restore_window_state(self):
         """Restore window geometry and state"""

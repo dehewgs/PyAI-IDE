@@ -26,6 +26,10 @@ class CodeExecutor(QObject):
         self.process: Optional[subprocess.Popen] = None
         self.is_running = False
     
+    def execute(self, file_path: str, working_dir: Optional[str] = None):
+        """Alias for execute_python for backward compatibility"""
+        return self.execute_python(file_path, working_dir)
+    
     def execute_python(self, file_path: str, working_dir: Optional[str] = None):
         """Execute Python file
         
@@ -115,6 +119,10 @@ class CodeExecutor(QObject):
             return
         
         self.execute_python(str(entry_file), str(project_path))
+    
+    def stop(self):
+        """Alias for stop_execution for backward compatibility"""
+        return self.stop_execution()
     
     def stop_execution(self):
         """Stop current execution"""

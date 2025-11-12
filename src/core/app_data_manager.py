@@ -211,6 +211,10 @@ class AppDataManager:
         """Get AppData directory path"""
         return self.app_data_dir
     
+    def get_app_data_dir(self) -> Path:
+        """Alias for get_app_data_path for backward compatibility"""
+        return self.get_app_data_path()
+    
     def get_themes_path(self) -> Path:
         """Get themes directory path"""
         return self.themes_dir
