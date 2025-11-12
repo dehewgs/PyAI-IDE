@@ -52,7 +52,7 @@ def main():
         app_data_manager = AppDataManager()
         logger.info(f"AppData initialized at: {app_data_manager.get_app_data_path()}")
         
-                app = QApplication(sys.argv)
+        app = QApplication(sys.argv)
         
         # Set application metadata
         app.setApplicationName("PyAI IDE")
