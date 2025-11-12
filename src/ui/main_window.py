@@ -190,8 +190,10 @@ class MainWindow(QMainWindow):
         
         # Run menu
         run_menu = menubar.addMenu("Run")
-        run_menu.addAction("Run Project", self._on_run_project)
-        run_menu.addAction("Stop Execution", self._on_stop_execution)
+        run_menu.addAction("Run File", self.run_code, "Ctrl+R")
+        run_menu.addAction("Run Project", self._on_run_project, "Ctrl+Shift+R")
+        run_menu.addSeparator()
+        run_menu.addAction("Stop Execution", self._on_stop_execution, "Ctrl+C")
         
         # View menu
         view_menu = menubar.addMenu("View")
@@ -242,6 +244,13 @@ class MainWindow(QMainWindow):
         self.event_system.subscribe("model_loaded", self._on_model_loaded_event)
         self.event_system.subscribe("inference_complete", self._on_inference_complete_event)
         self.event_system.subscribe("file_saved", self._on_file_saved_event)
+        # Connect code executor signals to console and terminal
+        self.code_executor.output_received.connect(self.console_panel.append_output)
+        self.code_executor.output_received.connect(self.terminal_panel.write)
+        self.code_executor.error_received.connect(self.console_panel.append_error)
+        self.code_executor.error_received.connect(self.terminal_panel.write_error)
+        self.code_executor.execution_finished.connect(self._on_execution_finished)
+
     
     def _restore_window_state(self):
         """Restore window geometry and state"""
@@ -548,6 +557,75 @@ class MainWindow(QMainWindow):
         if not self.shortcut_handler.handle_key_event(event):
             super().keyPressEvent(event)
 
+    def run_code(self):
+        """Run the current file"""
+        if not self.current_file:
+            QMessageBox.warning(self, "No File", "Please open a file first")
+            return
+        
+        file_path = Path(self.current_file)
+        if file_path.suffix != '.py':
+            QMessageBox.warning(self, "Invalid File", "Only Python files can be executed")
+            return
+        
+        self.terminal_panel.set_directory(str(file_path.parent))
+        self.code_executor.execute_python(str(file_path), str(file_path.parent))
+    
+    def run_project(self):
+        """Run the current project"""
+        if not self.current_project:
+            QMessageBox.warning(self, "No Project", "Please open a project first")
+            return
+        
+        project_path = Path(self.current_project)
+        main_file = project_path / "main.py"
+        
+        if not main_file.exists():
+            QMessageBox.warning(self, "No main.py", f"Project must have a main.py file")
+            return
+        
+        self.terminal_panel.set_directory(str(project_path))
+        self.code_executor.execute_project(str(project_path))
+    
+    def _on_execution_finished(self, return_code: int):
+        """Handle execution finished"""
+        if return_code == 0:
+            self.terminal_panel.write_success(f"\nExecution completed successfully\n")
+        else:
+            self.terminal_panel.write_error(f"\nExecution failed with code {return_code}\n")
+    
+    def new_project(self):
+        """Create a new project"""
+        from PyQt5.QtWidgets import QInputDialog
+        project_name, ok = QInputDialog.getText(self, "New Project", "Project name:")
+        if ok and project_name:
+            project_path = self.app_data_manager.get_project_dir() / project_name
+            project_path.mkdir(parents=True, exist_ok=True)
+            
+            # Create main.py
+            main_file = project_path / "main.py"
+            main_file.write_text("# New Python Project\nprint('Hello, World!')")
+            
+            self.project_panel.set_project_root(str(project_path))
+            self.current_project = str(project_path)
+            self.app_data_manager.add_recent_project(str(project_path))
+            logger.info(f"Created new project: {project_path}")
+    
+    def open_project(self):
+        """Open an existing project"""
+        from PyQt5.QtWidgets import QFileDialog
+        project_path = QFileDialog.getExistingDirectory(self, "Open Project")
+        if project_path:
+            self._open_project_path(project_path)
+    
+    def _on_run_project(self):
+        """Run the current project"""
+        self.run_project()
+    
+    def _on_stop_execution(self):
+        """Stop code execution"""
+        self.code_executor.stop_execution()
+    
     def _discover_projects(self):
         """Discover projects from AppData directory"""
         try:
