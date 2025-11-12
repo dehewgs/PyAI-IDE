@@ -1,0 +1,26 @@
+PyAI IDE
+A lightweight, fully-featured Python IDE with integrated HuggingFace and GitHub support, built with PyQt5.
+
+Features
+Core IDE Features
+Multi-file Editor: Tabbed interface for editing multiple Python files
+Syntax Highlighting: Full Python syntax highlighting with Pygments
+Project Management: Organize and manage Python projects
+Console Output: Real-time console for script execution and debugging
+Dark/Light Themes: Customizable UI themes
+AI Integration
+HuggingFace Models: Load and run inference with HuggingFace models
+Local & API Inference: Support for both local model execution and API-based inference
+Model Management: Easy model loading, unloading, and switching
+Model Search: Search and discover models from HuggingFace Hub
+GitHub Integration
+Repository Management: Create, clone, and manage GitHub repositories
+Authentication: Secure GitHub token-based authentication
+Git Operations: Push, pull, and commit changes directly from the IDE
+Issue & PR Management: Create issues and pull requests
+Repository Browser: Browse and manage your repositories
+Plugin System
+Extensible Architecture: Create custom plugins to extend functionality
+Hook System: Register callbacks for various application events, including for AI use
+Plugin Manager: Enable/disable plugins at runtime
+Easy Development: Simple plugin API for developers
