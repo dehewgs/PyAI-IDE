@@ -1,16 +1,21 @@
 """
-Core modules for PyAI IDE
+Core module for PyAI IDE
 """
 
-from .plugin_system import BasePlugin, PluginManager, PluginHook
 from .config_manager import ConfigManager
-from .event_system import EventSystem, EventListener
+from .event_system import EventSystem
+from .plugin_system import PluginManager
+from .app_data_manager import AppDataManager
+from .code_executor import CodeExecutor, LanguageExecutor
+from .shortcuts_manager import ShortcutsManager, ShortcutHandler
 
 __all__ = [
-    'BasePlugin',
-    'PluginManager',
-    'PluginHook',
     'ConfigManager',
     'EventSystem',
-    'EventListener',
+    'PluginManager',
+    'AppDataManager',
+    'CodeExecutor',
+    'LanguageExecutor',
+    'ShortcutsManager',
+    'ShortcutHandler',
 ]
