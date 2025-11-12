@@ -22,9 +22,10 @@ class EnhancedProjectPanel(QWidget):
     file_deleted = pyqtSignal(str)
     file_renamed = pyqtSignal(str, str)
     
-    def __init__(self, parent=None, theme_manager=None):
+    def __init__(self, parent=None, theme_manager=None, app_data_manager=None):
         super().__init__(parent)
         self.theme_manager = theme_manager
+        self.app_data_manager = app_data_manager
         self.project_root = None
         self.file_watcher_timer = None
         self._create_ui()
@@ -270,3 +271,52 @@ class EnhancedProjectPanel(QWidget):
                 background-color: #0e639c;
             }}
         """)
+
+    def load_projects_from_appdata(self):
+        """Load projects from AppData directory"""
+        if not self.app_data_manager:
+            logger.warning("AppDataManager not available")
+            return []
+        
+        try:
+            projects_dir = self.app_data_manager.get_project_dir()
+            if not projects_dir.exists():
+                return []
+            
+            projects = []
+            for item in projects_dir.iterdir():
+                if item.is_dir():
+                    projects.append({
+                        'name': item.name,
+                        'path': str(item),
+                        'created': item.stat().st_ctime
+                    })
+            
+            return sorted(projects, key=lambda x: x['created'], reverse=True)
+        except Exception as e:
+            logger.error(f"Failed to load projects from AppData: {e}")
+            return []
+    
+    def get_recent_projects(self):
+        """Get recent projects from AppData"""
+        if not self.app_data_manager:
+            return []
+        
+        try:
+            return self.app_data_manager.get_recent_projects()
+        except Exception as e:
+            logger.error(f"Failed to get recent projects: {e}")
+            return []
+    
+    def save_project_to_appdata(self, project_path: str):
+        """Save project to AppData"""
+        if not self.app_data_manager:
+            logger.warning("AppDataManager not available")
+            return False
+        
+        try:
+            self.app_data_manager.add_recent_project(project_path)
+            return True
+        except Exception as e:
+            logger.error(f"Failed to save project to AppData: {e}")
+            return False

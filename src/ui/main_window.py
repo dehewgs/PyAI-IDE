@@ -104,7 +104,7 @@ class MainWindow(QMainWindow):
         left_layout.setContentsMargins(0, 0, 0, 0)
         
         # Enhanced Project panel with file operations
-        self.project_panel = EnhancedProjectPanel(theme_manager=self.theme_manager)
+        self.project_panel = EnhancedProjectPanel(app_data_manager=self.app_data_manager, theme_manager=self.theme_manager)
         self.theme_manager.register_component(self.project_panel)
         self.project_panel.file_selected.connect(self._on_file_selected)
         self.project_panel.file_created.connect(self._on_file_created)
