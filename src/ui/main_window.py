@@ -351,7 +351,9 @@ class MainWindow(QMainWindow):
             theme_name: Theme identifier
         """
         logger.info(f"Applying theme: {theme_name}")
-        self.theme_manager.set_theme(self, theme_name)
+        from PyQt5.QtWidgets import QApplication
+        app = QApplication.instance()
+        self.theme_manager.set_theme(app, theme_name)
         self.status_bar.showMessage(f"Theme changed to: {theme_name}")
     
     # TOOLS OPERATIONS
