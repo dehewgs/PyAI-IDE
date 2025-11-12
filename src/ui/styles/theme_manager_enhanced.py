@@ -77,15 +77,6 @@ class EnhancedThemeManager(QObject):
         ui_colors = self.theme_config.ui_colors
         colors = self.theme_config.colors
         
-        # Get safe defaults from theme config
-        menu_bg = ui_colors.get('menu_background', colors.get('background', '#1e1e1e'))
-        menu_fg = ui_colors.get('menu_foreground', colors.get('foreground', '#d4d4d4'))
-        menu_selected = ui_colors.get('menu_selected', colors.get('primary', '#0e639c'))
-        button_bg = ui_colors.get('button_background', colors.get('primary', '#0e639c'))
-        button_fg = ui_colors.get('button_foreground', colors.get('background', '#ffffff'))
-        input_bg = ui_colors.get('input_background', colors.get('background', '#ffffff'))
-        input_fg = ui_colors.get('input_foreground', colors.get('foreground', '#333333'))
-        input_border = ui_colors.get('input_border', colors.get('border', '#cccccc'))
         # Determine if dark theme based on background color
         is_dark = colors.get('background', '#1e1e1e').lower() in ['#1e1e1e', '#000000', '#0a0a0a']
         
@@ -100,6 +91,16 @@ class EnhancedThemeManager(QObject):
         default_bg = dark_default_bg if is_dark else light_default_bg
         default_fg = dark_default_fg if is_dark else light_default_fg
         default_border = dark_default_border if is_dark else light_default_border
+        
+        # Get safe defaults from theme config using theme-aware defaults
+        menu_bg = ui_colors.get('menu_background', colors.get('background', default_bg))
+        menu_fg = ui_colors.get('menu_foreground', colors.get('foreground', default_fg))
+        menu_selected = ui_colors.get('menu_selected', colors.get('primary', '#0e639c'))
+        button_bg = ui_colors.get('button_background', colors.get('primary', '#0e639c'))
+        button_fg = ui_colors.get('button_foreground', colors.get('foreground', default_fg))
+        input_bg = ui_colors.get('input_background', colors.get('background', default_bg))
+        input_fg = ui_colors.get('input_foreground', colors.get('foreground', default_fg))
+        input_border = ui_colors.get('input_border', colors.get('border', default_border))
         
         tab_bg = ui_colors.get('tab_background', colors.get('background_secondary', default_bg))
         tab_fg = ui_colors.get('tab_foreground', colors.get('foreground', default_fg))
