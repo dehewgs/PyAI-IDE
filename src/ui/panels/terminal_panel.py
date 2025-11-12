@@ -258,17 +258,21 @@ class TerminalPanel(QWidget):
         """Apply theme to terminal"""
         if self.theme_manager:
             try:
-                theme = self.theme_manager.get_current_theme()
+                theme_name = self.theme_manager.current_theme
                 
-                # Set output area colors
-                bg_color = theme.get('background', '#1e1e1e')
-                fg_color = theme.get('foreground', '#ffffff')
+                # Set output area colors based on theme
+                if theme_name == 'light':
+                    bg_color = '#ffffff'
+                    fg_color = '#333333'
+                else:
+                    bg_color = '#1e1e1e'
+                    fg_color = '#d4d4d4'
                 
                 self.output.setStyleSheet(f"""
                     QPlainTextEdit {{
                         background-color: {bg_color};
                         color: {fg_color};
-                        border: 1px solid {theme.get('border', '#333333')};
+                        border: 1px solid {'#3e3e3e' if theme_name == 'dark' else '#cccccc'};
                     }}
                 """)
                 
@@ -276,7 +280,7 @@ class TerminalPanel(QWidget):
                     QLineEdit {{
                         background-color: {bg_color};
                         color: {fg_color};
-                        border: 1px solid {theme.get('border', '#333333')};
+                        border: 1px solid {'#3e3e3e' if theme_name == 'dark' else '#cccccc'};
                         padding: 4px;
                     }}
                 """)
