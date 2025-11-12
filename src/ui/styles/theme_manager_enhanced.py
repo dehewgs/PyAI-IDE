@@ -221,34 +221,34 @@ class EnhancedThemeManager(QObject):
                 padding-top: 10px;
             }}
             QGroupBox::title {{
-            QDialog {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 3px 0 3px;
+            }}
+                    QDialog {{
                 background-color: {menu_bg};
                 color: {menu_fg};
-            }
-            QMessageBox {
+            }}
+            QMessageBox {{
                 background-color: {menu_bg};
                 color: {menu_fg};
-            }
-            QMessageBox QLabel {
+            }}
+            QMessageBox QLabel {{
                 color: {menu_fg};
-            }
-            QMessageBox QPushButton {
+            }}
+            QMessageBox QPushButton {{
                 background-color: {button_bg};
                 color: {button_fg};
                 border: none;
                 padding: 5px 15px;
                 border-radius: 3px;
                 min-width: 60px;
-            }
-            QMessageBox QPushButton:hover {
+            }}
+            QMessageBox QPushButton:hover {{
                 background-color: {primary_hover};
-            }
-            QMessageBox QPushButton:pressed {
+            }}
+            QMessageBox QPushButton:pressed {{
                 background-color: {primary_pressed};
-            }
-                subcontrol-origin: margin;
-                left: 10px;
-                padding: 0 3px 0 3px;
             }}
         """
         
