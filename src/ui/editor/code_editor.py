@@ -10,22 +10,35 @@ import re
 
 
 class PythonSyntaxHighlighter(QSyntaxHighlighter):
-    """Python syntax highlighter with theme support"""
+    """Python syntax highlighter with language-specific colors"""
     
-    def __init__(self, document, theme_config=None):
+    def __init__(self, document, language="python"):
         super().__init__(document)
-        self.theme_config = theme_config
+        self.language = language
         self._setup_formats()
     
     def _setup_formats(self):
-        """Setup text formats based on theme"""
-        if self.theme_config:
-            keyword_color = self.theme_config.get_editor_color("keyword", "#f92672")
-            string_color = self.theme_config.get_editor_color("string", "#e6db74")
-            comment_color = self.theme_config.get_editor_color("comment", "#75715e")
-            function_color = self.theme_config.get_editor_color("function", "#66d9ef")
-            number_color = self.theme_config.get_editor_color("number", "#ae81ff")
-        else:
+        """Setup text formats based on language"""
+        # Language-specific color schemes
+        if self.language == "python":
+            keyword_color = "#f92672"
+            string_color = "#e6db74"
+            comment_color = "#75715e"
+            function_color = "#66d9ef"
+            number_color = "#ae81ff"
+        elif self.language == "javascript":
+            keyword_color = "#d73a49"
+            string_color = "#032f62"
+            comment_color = "#6a737d"
+            function_color = "#6f42c1"
+            number_color = "#005cc5"
+        elif self.language == "java":
+            keyword_color = "#d73a49"
+            string_color = "#032f62"
+            comment_color = "#6a737d"
+            function_color = "#6f42c1"
+            number_color = "#005cc5"
+        else:  # Default
             keyword_color = "#f92672"
             string_color = "#e6db74"
             comment_color = "#75715e"
@@ -59,13 +72,13 @@ class PythonSyntaxHighlighter(QSyntaxHighlighter):
             'True', 'try', 'while', 'with', 'yield'
         ]
     
-    def update_theme(self, theme_config):
-        """Update theme configuration
+    def set_language(self, language):
+        """Set language for syntax highlighting
         
         Args:
-            theme_config: New theme configuration
+            language: Programming language (python, javascript, java, etc.)
         """
-        self.theme_config = theme_config
+        self.language = language
         self._setup_formats()
         self.rehighlight()
     
@@ -104,28 +117,22 @@ class LineNumberArea(QWidget):
         self.editor = editor
     
     def sizeHint(self):
-        """Return size hint"""
         return QSize(self.editor.line_number_area_width(), 0)
     
     def paintEvent(self, event):
-        """Paint line numbers"""
         self.editor.line_number_area_paint_event(event)
 
 
 class CodeEditor(QPlainTextEdit):
-    """Code editor with syntax highlighting and line numbers"""
+    """Code editor with syntax highlighting"""
     
-    def __init__(self, parent=None, theme_manager=None):
-        super().__init__(parent)
+    def __init__(self, theme_manager=None, language="python"):
+        super().__init__()
         self.theme_manager = theme_manager
-        
-        # Setup font
-        font = QFont("Courier New", 10)
-        font.setFixedPitch(True)
-        self.setFont(font)
+        self.language = language
         
         # Setup syntax highlighter
-        self.highlighter = PythonSyntaxHighlighter(self.document(), self._get_theme_config())
+        self.highlighter = PythonSyntaxHighlighter(self.document(), language)
         
         # Setup line numbers
         self.line_number_area = LineNumberArea(self)
@@ -134,49 +141,35 @@ class CodeEditor(QPlainTextEdit):
         self.cursorPositionChanged.connect(self.highlight_current_line)
         
         self.update_line_number_area_width(0)
-        self.highlight_current_line()
         
-        # Apply theme
+        # Setup editor appearance
         self._apply_theme()
-        
-        # Connect to theme changes if theme manager available
-        if self.theme_manager:
-            self.theme_manager.theme_changed.connect(self._on_theme_changed)
-    
-    def _get_theme_config(self):
-        """Get theme configuration"""
-        if self.theme_manager and self.theme_manager.current_config:
-            return self.theme_manager.current_config
-        return None
     
     def _apply_theme(self):
-        """Apply theme to editor"""
-        theme_config = self._get_theme_config()
-        
-        if theme_config:
-            bg_color = theme_config.get_editor_color("background", "#272822")
-            fg_color = theme_config.get_editor_color("foreground", "#f8f8f2")
+        """Apply theme to editor UI (not syntax highlighting)"""
+        if self.theme_manager:
+            bg = self.theme_manager.get_color("background", "#1e1e1e")
+            fg = self.theme_manager.get_color("foreground", "#d4d4d4")
         else:
-            bg_color = "#272822"
-            fg_color = "#f8f8f2"
+            bg = "#1e1e1e"
+            fg = "#d4d4d4"
         
         self.setStyleSheet(f"""
             QPlainTextEdit {{
-                background-color: {bg_color};
-                color: {fg_color};
+                background-color: {bg};
+                color: {fg};
                 border: none;
             }}
         """)
     
-    def _on_theme_changed(self, theme_id):
-        """Handle theme change
+    def set_language(self, language):
+        """Set programming language for syntax highlighting
         
         Args:
-            theme_id: New theme identifier
+            language: Programming language (python, javascript, java, etc.)
         """
-        self._apply_theme()
-        self.highlighter.update_theme(self._get_theme_config())
-        self.update_line_number_area_width(0)
+        self.language = language
+        self.highlighter.set_language(language)
     
     def line_number_area_width(self):
         """Calculate line number area width"""
@@ -209,14 +202,7 @@ class CodeEditor(QPlainTextEdit):
         
         if not self.isReadOnly():
             selection = QTextEdit.ExtraSelection()
-            
-            theme_config = self._get_theme_config()
-            if theme_config:
-                line_color_str = theme_config.get_editor_color("current_line_background", "#3e3d32")
-            else:
-                line_color_str = "#3e3d32"
-            
-            line_color = QColor(line_color_str)
+            line_color = QColor("#3e3d32")
             selection.format.setBackground(line_color)
             selection.format.setProperty(QTextFormat.FullWidthSelection, True)
             selection.cursor = self.textCursor()
@@ -228,16 +214,7 @@ class CodeEditor(QPlainTextEdit):
     def line_number_area_paint_event(self, event):
         """Paint line numbers"""
         painter = QPainter(self.line_number_area)
-        
-        theme_config = self._get_theme_config()
-        if theme_config:
-            bg_color = theme_config.get_editor_color("line_number_background", "#272822")
-            fg_color = theme_config.get_editor_color("line_number_foreground", "#757569")
-        else:
-            bg_color = "#272822"
-            fg_color = "#757569"
-        
-        painter.fillRect(event.rect(), QColor(bg_color))
+        painter.fillRect(event.rect(), QColor("#272822"))
         
         block = self.firstVisibleBlock()
         block_number = block.blockNumber()
@@ -247,8 +224,8 @@ class CodeEditor(QPlainTextEdit):
         while block.isValid() and top <= event.rect().bottom():
             if block.isVisible() and bottom >= event.rect().top():
                 number = str(block_number + 1)
-                painter.setPen(QColor(fg_color))
-                painter.drawText(0, int(top), self.line_number_area.width() - 2, 
+                painter.setPen(QColor("#757569"))
+                painter.drawText(0, int(top), self.line_number_area.width() - 3, 
                                self.fontMetrics().height(), Qt.AlignRight, number)
             
             block = block.next()
