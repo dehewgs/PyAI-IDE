@@ -1,152 +1,100 @@
 """
-Console Panel for PyAI IDE with Theme Support
+Console Panel for PyAI IDE
 """
 
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTextEdit, QPushButton, QLabel
-from PyQt5.QtCore import pyqtSignal
-from utils.logger import logger
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QHBoxLayout, QPushButton
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QTextCursor, QColor, QTextCharFormat
 
 
 class ConsolePanel(QWidget):
-    """Console panel for output and debugging with theme support"""
+    """Console panel for displaying output"""
     
-    def __init__(self, parent=None, theme_manager=None):
-        super().__init__(parent)
-        self.output_lines = []
+    def __init__(self, theme_manager=None):
+        super().__init__()
         self.theme_manager = theme_manager
-        self._create_ui()
-        
-        # Connect to theme changes if theme manager available
-        if self.theme_manager:
-            self.theme_manager.theme_changed.connect(self._on_theme_changed)
+        self._setup_ui()
     
-    def _create_ui(self):
-        """Create console UI"""
-        layout = QVBoxLayout(self)
+    def _setup_ui(self):
+        """Setup UI"""
+        layout = QVBoxLayout()
         
-        # Header
-        header_layout = QHBoxLayout()
-        header_layout.addWidget(QLabel("Console Output"))
-        self.clear_btn = QPushButton("Clear")
-        self.clear_btn.clicked.connect(self.clear)
-        header_layout.addStretch()
-        header_layout.addWidget(self.clear_btn)
-        layout.addLayout(header_layout)
-        
-        # Output area
-        self.output = QTextEdit()
-        self.output.setReadOnly(True)
-        layout.addWidget(self.output)
-        
-        # Apply theme
-        self._apply_theme()
-    
-    def _apply_theme(self):
-        """Apply theme to console"""
-        if self.theme_manager and self.theme_manager.current_config:
-            bg_color = self.theme_manager.get_console_color("background", "#1e1e1e")
-            fg_color = self.theme_manager.get_console_color("foreground", "#d4d4d4")
-        else:
-            bg_color = "#1e1e1e"
-            fg_color = "#d4d4d4"
-        
-        self.output.setStyleSheet(f"""
-            QTextEdit {{
-                background-color: {bg_color};
-                color: {fg_color};
-                font-family: 'Courier New';
-                font-size: 10px;
-            }}
+        # Console output
+        self.console_output = QTextEdit()
+        self.console_output.setReadOnly(True)
+        self.console_output.setStyleSheet("""
+            QTextEdit {
+                background-color: #1e1e1e;
+                color: #d4d4d4;
+                border: none;
+                font-family: 'Courier New', monospace;
+                font-size: 10pt;
+            }
         """)
-    
-    def _on_theme_changed(self, theme_id):
-        """Handle theme change
         
-        Args:
-            theme_id: New theme identifier
-        """
-        self._apply_theme()
+        layout.addWidget(self.console_output)
+        
+        # Clear button
+        button_layout = QHBoxLayout()
+        clear_btn = QPushButton("Clear")
+        clear_btn.clicked.connect(self.clear)
+        button_layout.addStretch()
+        button_layout.addWidget(clear_btn)
+        
+        layout.addLayout(button_layout)
+        self.setLayout(layout)
     
-    def write(self, text):
+    def write(self, text, color="#d4d4d4"):
         """Write text to console
         
         Args:
             text: Text to write
+            color: Text color (hex)
         """
-        self.output_lines.append(text)
-        self.output.append(text)
-        logger.debug(f"Console: {text}")
+        cursor = self.console_output.textCursor()
+        cursor.movePosition(QTextCursor.End)
+        
+        fmt = QTextCharFormat()
+        fmt.setForeground(QColor(color))
+        
+        cursor.setCharFormat(fmt)
+        cursor.insertText(text)
+        
+        self.console_output.setTextCursor(cursor)
+        self.console_output.ensureCursorVisible()
     
     def write_error(self, text):
-        """Write error text to console
+        """Write error message
         
         Args:
-            text: Error text to write
+            text: Error message
         """
-        if self.theme_manager and self.theme_manager.current_config:
-            error_color = self.theme_manager.get_console_color("error", "#f48771")
-        else:
-            error_color = "#f48771"
-        
-        self.output_lines.append(f"ERROR: {text}")
-        self.output.append(f"<span style='color: {error_color};'><b>ERROR:</b> {text}</span>")
-        logger.error(f"Console: {text}")
+        self.write(text + "\n", "#f48771")
     
     def write_warning(self, text):
-        """Write warning text to console
+        """Write warning message
         
         Args:
-            text: Warning text to write
+            text: Warning message
         """
-        if self.theme_manager and self.theme_manager.current_config:
-            warning_color = self.theme_manager.get_console_color("warning", "#dcdcaa")
-        else:
-            warning_color = "#dcdcaa"
-        
-        self.output_lines.append(f"WARNING: {text}")
-        self.output.append(f"<span style='color: {warning_color};'><b>WARNING:</b> {text}</span>")
-        logger.warning(f"Console: {text}")
+        self.write(text + "\n", "#dcdcaa")
     
     def write_success(self, text):
-        """Write success text to console
+        """Write success message
         
         Args:
-            text: Success text to write
+            text: Success message
         """
-        if self.theme_manager and self.theme_manager.current_config:
-            success_color = self.theme_manager.get_console_color("success", "#6a9955")
-        else:
-            success_color = "#6a9955"
-        
-        self.output_lines.append(f"SUCCESS: {text}")
-        self.output.append(f"<span style='color: {success_color};'><b>✓</b> {text}</span>")
-        logger.info(f"Console: {text}")
+        self.write(text + "\n", "#4ec9b0")
     
     def write_info(self, text):
-        """Write info text to console
+        """Write info message
         
         Args:
-            text: Info text to write
+            text: Info message
         """
-        if self.theme_manager and self.theme_manager.current_config:
-            info_color = self.theme_manager.get_console_color("info", "#4ec9b0")
-        else:
-            info_color = "#4ec9b0"
-        
-        self.output_lines.append(f"INFO: {text}")
-        self.output.append(f"<span style='color: {info_color};'><b>ℹ</b> {text}</span>")
-        logger.info(f"Console: {text}")
+        self.write(text + "\n", "#9cdcfe")
     
     def clear(self):
-        """Clear console"""
-        self.output.clear()
-        self.output_lines.clear()
-        logger.info("Console cleared")
-    
-    def get_output(self):
-        """Get all output
-        
-        Returns:
-            All console output as string
-        """
-        return '\n'.join(self.output_lines)
+        """Clear console output"""
+        self.console_output.clear()
