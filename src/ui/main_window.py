@@ -40,12 +40,15 @@ from ui.styles.theme_manager_enhanced import EnhancedThemeManager
 class MainWindow(QMainWindow):
     """Main application window with full feature integration"""
     
-    def __init__(self):
+    def __init__(self, app=None):
         super().__init__()
         self.setWindowTitle("PyAI IDE")
         self.setGeometry(100, 100, 1400, 900)
         
         logger.info("Initializing PyAI IDE Main Window")
+        
+        # Store app reference
+        self.app = app
         
         # Initialize managers
         self.app_data_manager = AppDataManager()
@@ -510,12 +513,19 @@ class MainWindow(QMainWindow):
         logger.info(f"File saved: {data}")
     
     # Theme operations
+    
     def _apply_theme(self, theme_name):
         """Apply theme"""
-        self.theme_manager.set_theme(theme_name)
+        if self.app:
+            self.theme_manager.set_theme(self.app, theme_name)
+        else:
+            # Fallback: get app from QApplication if not passed
+            from PyQt5.QtWidgets import QApplication
+            app = QApplication.instance()
+            if app:
+                self.theme_manager.set_theme(app, theme_name)
         self.app_data_manager.set_config_value('theme', theme_name)
     
-    # Window events
     def closeEvent(self, event):
         """Handle window close"""
         # Save window state

@@ -61,7 +61,7 @@ def main():
         
         # Create and show main window
         logger.info("Creating MainWindow...")
-        window = MainWindow()
+        window = MainWindow(app)
         logger.info("MainWindow created successfully")
         
         logger.info("Showing MainWindow...")
