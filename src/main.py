@@ -54,6 +54,11 @@ def main():
         app.setApplicationVersion("1.0.0")
         logger.debug("Application metadata set")
         
+        # Set application style to Fusion to ensure stylesheets work properly
+        from PyQt5.QtWidgets import QStyleFactory
+        app.setStyle(QStyleFactory.create('Fusion'))
+        logger.debug("Application style set to Fusion")
+        
         # Create and show main window
         logger.info("Creating MainWindow...")
         window = MainWindow()

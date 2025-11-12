@@ -99,6 +99,7 @@ class MainWindow(QMainWindow):
         self.tab_widget = QTabWidget()
         self.tab_widget.setTabsClosable(True)
         self.tab_widget.tabCloseRequested.connect(self._on_tab_close)
+        self.theme_manager.register_component(self.tab_widget)
         
         center_layout.addWidget(self.tab_widget)
         
