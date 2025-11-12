@@ -3,53 +3,47 @@
   "id": "light",
   "colors": {
     "primary": "#0e639c",
-    "primary_hover": "#1177bb",
-    "primary_pressed": "#0d5a96",
     "background": "#ffffff",
-    "background_secondary": "#f5f5f5",
-    "background_tertiary": "#f0f0f0",
     "foreground": "#333333",
-    "foreground_secondary": "#666666",
     "border": "#cccccc",
-    "selection": "#0e639c",
-    "selection_inactive": "#d0d0d0"
+    "accent": "#0066cc",
+    "error": "#cb2431",
+    "warning": "#d18616",
+    "success": "#28a745",
+    "info": "#0066cc"
   },
   "editor": {
     "background": "#ffffff",
     "foreground": "#333333",
-    "line_number_background": "#f5f5f5",
-    "line_number_foreground": "#999999",
-    "current_line_background": "#f0f0f0",
-    "selection_background": "#add6ff",
-    "keyword": "#0000ff",
-    "string": "#a31515",
-    "comment": "#008000",
-    "function": "#795e26",
-    "number": "#098658",
-    "operator": "#333333"
+    "keyword": "#d73a49",
+    "string": "#032f62",
+    "comment": "#6a737d",
+    "function": "#6f42c1",
+    "number": "#005cc5",
+    "line_number": "#999999",
+    "line_number_bg": "#f5f5f5",
+    "current_line": "#f0f0f0",
+    "selection": "#add6ff"
   },
   "console": {
     "background": "#ffffff",
     "foreground": "#333333",
-    "error": "#d13438",
-    "warning": "#ffb900",
-    "success": "#107c10",
-    "info": "#0078d4"
+    "error": "#cb2431",
+    "warning": "#d18616",
+    "success": "#28a745",
+    "info": "#0066cc"
   },
   "ui": {
-    "menu_background": "#f0f0f0",
+    "menu_background": "#f3f3f3",
     "menu_foreground": "#333333",
     "menu_selected": "#0e639c",
     "button_background": "#0e639c",
     "button_foreground": "#ffffff",
-    "input_background": "#ffffff",
-    "input_foreground": "#333333",
-    "input_border": "#cccccc",
-    "tab_background": "#f0f0f0",
-    "tab_foreground": "#333333",
-    "tab_selected_background": "#ffffff",
-    "tab_selected_border": "#0e639c",
-    "status_bar_background": "#f0f0f0",
-    "status_bar_foreground": "#333333"
+    "button_hover": "#1177bb",
+    "button_pressed": "#0d5a96",
+    "panel_background": "#ffffff",
+    "panel_foreground": "#333333",
+    "header_background": "#f3f3f3",
+    "header_foreground": "#333333"
   }
 }

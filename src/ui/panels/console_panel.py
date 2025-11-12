@@ -88,6 +88,22 @@ class ConsolePanel(QWidget):
         self.console_output.setTextCursor(cursor)
         self.console_output.ensureCursorVisible()
     
+    def append_output(self, text):
+        """Append output text (alias for write)
+        
+        Args:
+            text: Text to append
+        """
+        self.write(text)
+    
+    def append_error(self, text):
+        """Append error message
+        
+        Args:
+            text: Error message
+        """
+        self.write_error(text)
+    
     def write_error(self, text):
         """Write error message
         
