@@ -17,7 +17,7 @@ class EnhancedThemeManager(QObject):
     def __init__(self):
         super().__init__()
         self.current_theme = "dark"
-        self.theme_config = ThemeConfig()
+        self.theme_config = ThemeConfig("dark")
         self.registered_components = []
     
     def register_component(self, component):
@@ -46,11 +46,12 @@ class EnhancedThemeManager(QObject):
             theme_name: Theme identifier (dark, light, etc.)
         """
         self.current_theme = theme_name
-        self.theme_config.load_theme(theme_name)
+        # Create new ThemeConfig with the theme name
+        self.theme_config = ThemeConfig(theme_name)
         
         # Emit signals
         self.theme_changed.emit(theme_name)
-        self.colors_changed.emit(self.theme_config.colors)
+        self.colors_changed.emit(self.theme_config.get_all_colors())
         
         # Update all registered components
         for component in self.registered_components:
